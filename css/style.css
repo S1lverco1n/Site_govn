@@ -1,0 +1,213 @@
+/* ==========================================================================
+   1. Глобальные переменные CSS, сбросы и базовые стили
+   ========================================================================== */
+:root {
+    /* Основная цветовая палитра */
+    --color-text: #343a40;
+    --color-background: #f8f9fa;
+    --color-primary: #007bff;
+    --color-header-bg: #343a40;
+    --color-header-text: #fff;
+    --color-header-link: #adb5bd;
+    --color-header-link-hover-bg: #495057;
+    --color-footer-bg: var(--color-header-bg);
+    --color-footer-text: var(--color-header-link);
+    --color-section-bg: #fff;
+    --color-section-shadow: rgba(0,0,0,0.08);
+    --color-border: #e9ecef;
+    --color-input-border: #ced4da;
+    --color-input-focus-border: #80bdff;
+    --color-input-focus-shadow: rgba(0,123,255,.25);
+    --color-button-primary-bg: var(--color-primary);
+    --color-button-primary-text: #fff;
+    --color-button-primary-hover-bg: #0056b3;
+
+    /* Палитра сообщений */
+    --color-success-bg: #d4edda;
+    --color-success-text: #155724;
+    --color-success-border: #c3e6cb;
+    --color-error-bg: #f8d7da;
+    --color-error-text: #721c24;
+    --color-error-border: #f5c6cb;
+
+    /* Шрифты */
+    --font-family-base: 'Lato', Arial, sans-serif;
+    --font-size-base: 1rem;
+    --line-height-base: 1.7;
+
+    /* Цвета для кастомного модального окна (пастельные телесные) */
+    --cem-overlay-bg: rgba(60, 40, 30, 0.7);
+    --cem-wing-bg: #F0D8C0; 
+    --cem-editor-bg: #F8E8D8; 
+    --cem-title-bar-bg: var(--cem-wing-bg);
+    --cem-text-color: #6D4C41; 
+    --cem-input-bg: #FAF0E6; 
+    --cem-input-border: #D7CCC8; 
+    --cem-button-save-bg: #A1887F; 
+    --cem-button-save-text: #FFFFFF;
+    --cem-button-cancel-bg: #E0E0E0;
+    --cem-button-cancel-text: #424242;
+}
+
+/* "Розовая" тема для body */
+body.pink-theme {
+    --color-background: #ffebef;
+    --color-header-bg: #c71585;
+    --color-header-link: #ffe4e1;
+    --color-header-link-hover-bg: #db7093;
+    --color-primary: #c71585;
+    --color-button-primary-hover-bg: #ad1170;
+    --color-input-focus-border: #ffb6c1;
+    --color-input-focus-shadow: rgba(199, 21, 133, 0.25);
+    transition: background-color 0.4s ease-in-out;
+}
+body.pink-theme .section-styled {
+    background-color: #fff; 
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-family-base); line-height: var(--line-height-base); background-color: var(--color-background); color: var(--color-text); display: flex; flex-direction: column; min-height: 100vh; }
+p { margin-bottom: 1rem; }
+.container { width: 90%; max-width: 800px; margin: 0 auto; padding: 0 15px; }
+
+/* ==========================================================================
+   2. Шапка (Header)
+   ========================================================================== */
+header { background: var(--color-header-bg); color: var(--color-header-text); padding: 20px 0; text-align: center; margin-bottom: 30px; box-shadow: 0 2px 4px var(--color-section-shadow); transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out; }
+header h1 { margin: 0; font-size: 2.2rem; }
+header nav { margin-top: 15px; }
+header nav a, header nav span { color: var(--color-header-link); text-decoration: none; padding: 8px 15px; margin: 0 5px; border-radius: 4px; transition: background-color 0.3s ease, color 0.3s ease; }
+header nav strong { color: var(--color-header-text); }
+header nav a:hover { background-color: var(--color-header-link-hover-bg); color: var(--color-header-text); }
+
+/* ==========================================================================
+   3. Основной контент (Main) и Секции
+   ========================================================================== */
+main { flex-grow: 1; padding-bottom: 40px; }
+main h2 { color: var(--color-primary); margin-bottom: 20px; font-size: 1.8rem; border-bottom: 2px solid var(--color-border); padding-bottom: 10px; transition: color 0.4s ease-in-out; }
+.section-styled { background: var(--color-section-bg); padding: 25px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 5px var(--color-section-shadow); }
+main a:not(.button-like-link):not(.edit-post-btn) { color: var(--color-primary); text-decoration: none; transition: color 0.4s ease-in-out; }
+main a:not(.button-like-link):not(.edit-post-btn):hover { text-decoration: underline; }
+
+/* ==========================================================================
+   4. Формы (Общие)
+   ========================================================================== */
+form div { margin-bottom: 20px; }
+form label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--color-text); }
+form input[type="text"], form input[type="email"], form input[type="password"], form textarea, form input[type="file"] { width: 100%; max-width: 500px; padding: 12px 15px; border: 1px solid var(--color-input-border); border-radius: 5px; font-size: var(--font-size-base); font-family: var(--font-family-base); transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+form input[type="file"] { padding: 8px 10px; }
+form input[type="text"]:focus, form input[type="email"]:focus, form input[type="password"]:focus, form textarea:focus { border-color: var(--color-input-focus-border); outline: 0; box-shadow: 0 0 0 0.2rem var(--color-input-focus-shadow); }
+form textarea { min-height: 100px; resize: vertical; }
+
+/* ==========================================================================
+   5. Кнопки (Общие и специфичные)
+   ========================================================================== */
+button[type="submit"], .button-like-link { display: inline-block; background-color: var(--color-button-primary-bg); color: var(--color-button-primary-text); border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: var(--font-size-base); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; transition: background-color 0.2s ease-in-out; text-decoration: none; }
+button[type="submit"]:hover, .button-like-link:hover { background-color: var(--color-button-primary-hover-bg); }
+
+.edit-post-btn.js-open-edit-modal { background-color: #E0A070; color: #402C1B; padding: 8px 15px; font-size: 0.9rem; text-transform: none; margin-right: 10px; vertical-align: middle; }
+.edit-post-btn.js-open-edit-modal:hover { background-color: #D29060; }
+.delete-post-btn { background-color: #dc3545; color: var(--color-button-primary-text); padding: 8px 15px; font-size: 0.9rem; text-transform: none; }
+.delete-post-btn:hover { background-color: #c82333; }
+
+body.pink-theme .edit-post-btn.js-open-edit-modal { background-color: #ba68c8; color: var(--color-button-primary-text); }
+body.pink-theme .edit-post-btn.js-open-edit-modal:hover { background-color: #aa47bc; }
+body.pink-theme .delete-post-btn { background-color: #ab47bc; }
+body.pink-theme .delete-post-btn:hover { background-color: #8e24aa; }
+
+/* ==========================================================================
+   6. Сообщения (Error/Success)
+   ========================================================================== */
+.error-message, .success-message { padding: 15px; margin-bottom: 20px; border-radius: 5px; border-width: 1px; border-style: solid; }
+.error-message { background-color: var(--color-error-bg); color: var(--color-error-text); border-color: var(--color-error-border); }
+.success-message { background-color: var(--color-success-bg); color: var(--color-success-text); border-color: var(--color-success-border); }
+.success-message a { color: var(--color-success-text); font-weight: bold; }
+
+/* ==========================================================================
+   7. Список Постов
+   ========================================================================== */
+.post-item { border: 1px solid var(--color-border); padding: 20px; margin-bottom: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); background-color: var(--color-section-bg); }
+.post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--color-input-border); flex-wrap: wrap; }
+.post-author { font-weight: 700; color: var(--color-primary); margin-right: 10px; transition: color 0.4s ease-in-out; }
+.post-date { font-size: 0.85rem; color: #6c757d; white-space: nowrap; }
+.post-image-container { margin: 15px 0; text-align: center; }
+.post-image { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 2px 8px var(--color-section-shadow); }
+.post-content p { margin-bottom: 0; word-wrap: break-word; }
+.post-actions { margin-top: 15px; text-align: right; }
+
+/* ==========================================================================
+   8. Подвал (Footer)
+   ========================================================================== */
+footer { background: var(--color-footer-bg); color: var(--color-footer-text); text-align: center; padding: 25px 0; margin-top: auto; transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out; }
+
+/* ==========================================================================
+   9. Модальное окно Редактирования (Custom Edit Modal - CEM)
+   ========================================================================== */
+.cem-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--cem-overlay-bg); display: flex; justify-content: center; align-items: center; z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; }
+.cem-overlay.active { opacity: 1; visibility: visible; transition-delay: 0s; }
+
+.cem-wing {
+    position: absolute; /* Позиционирование и размеры будут заданы JS */
+    background-color: var(--cem-wing-bg);
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    z-index: 1051;
+
+    opacity: 0;
+    transform: scale(0.5); /* Начальное состояние для анимации "разворачивания" */
+    /* transform-origin будет зависеть от того, как JS их спозиционирует */
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.1s, opacity 0.3s ease-out 0.1s;
+}
+/* .cem-left-wing {}  Специфичные transform-origin, если нужны, можно добавить здесь */
+/* .cem-right-wing {} */
+
+.cem-overlay.active .cem-wing {
+    opacity: 1;
+    transform: scale(1); 
+}
+
+.cem-editor-pane {
+    position: relative; 
+    background-color: var(--cem-editor-bg);
+    width: 90vw; max-width: 550px; 
+    min-height: 300px; 
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    z-index: 1052; 
+    
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.320, 1.275) 0.3s, opacity 0.3s ease-out 0.3s;
+}
+.cem-overlay.active .cem-editor-pane {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.cem-title-bar { background-color: var(--cem-title-bar-bg); color: var(--cem-text-color); padding: 0; height: 45px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; font-size: 1.3em; font-weight: bold; line-height: 45px; overflow: hidden; }
+.cem-title-text { display: inline-block; white-space: nowrap; width: 100%; /* JS будет управлять letter-spacing для растягивания */ }
+
+.cem-form-container { padding: 15px 20px 20px 20px; overflow-y: auto; flex-grow: 1; }
+.cem-form-container label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: var(--cem-text-color); }
+.cem-form-container input[type="text"], .cem-form-container textarea, .cem-form-container input[type="file"] { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid var(--cem-input-border); border-radius: 4px; background-color: var(--cem-input-bg); color: var(--cem-text-color); font-size: 0.95em; }
+.cem-form-container input[type="file"] { padding: 6px 10px; }
+.cem-form-container textarea { min-height: 80px; resize: vertical; }
+.cem-form-container input[type="checkbox"] { width: auto; margin-right: 8px; vertical-align: middle; }
+.cem-checkbox-label { font-weight: normal; font-size: 0.9em; display: inline-flex; align-items: center; margin-top: 5px; color: var(--cem-text-color); }
+
+.cem-preview-image { max-width: 150px; max-height: 150px; display: block; margin-bottom: 8px; border: 1px solid var(--cem-input-border); border-radius: 4px; }
+#cemCurrentImagePreviewContainer p { font-size: 0.9em; font-weight: 600; margin-bottom: 5px; color: var(--cem-text-color); }
+
+.cem-modal-actions { margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; }
+.cem-button { padding: 10px 18px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: background-color 0.2s ease, opacity 0.2s ease; }
+.cem-button-save { background-color: var(--cem-button-save-bg); color: var(--cem-button-save-text); }
+.cem-button-save:hover { opacity: 0.85; }
+.cem-button-cancel { background-color: var(--cem-button-cancel-bg); color: var(--cem-button-cancel-text); }
+.cem-button-cancel:hover { opacity: 0.85; }
+
+.cem-form-message { margin-top: 12px; font-size: 0.85em; text-align: center; min-height: 1.2em; }
+.cem-form-message.success { color: var(--color-success-text); }
+.cem-form-message.error { color: var(--color-error-text); }
