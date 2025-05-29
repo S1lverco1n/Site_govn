@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (themeBodyElement && themeMainContainer) {
         themeBodyElement.addEventListener('click', function(event) {
-            if (event.target.closest('.cem-overlay')) return; // Не менять тему при клике на модалку
+            if (event.target.closest('.cem-overlay')) return;
             const clickedInsideMain = themeMainContainer.contains(event.target);
             if (!clickedInsideMain && event.target !== themeMainContainer) {
                 togglePinkTheme();
@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     // ---- Конец логики смены темы ----
-
-
+   
     // ---- Логика НОВОГО модального окна редактирования (cem) ----
     const cemModalOverlay = document.getElementById('customEditModalOverlay');
     const cemEditorPane = document.getElementById('cemEditorPane');
@@ -37,9 +36,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const cemModalLeftPanel = document.getElementById('cemLeftWing');
     const cemModalRightPanel = document.getElementById('cemRightWing');
 
+    // +++ Аудио элемент +++
+    let editSound = null; 
+    const soundPath = 'js/spring.mp3'; // Убедитесь, что путь правильный
+
+    // Инициализация звука (лучше при первом взаимодействии пользователя)
+    function initSound() {
+        if (!editSound) {
+            try {
+                editSound = new Audio(soundPath);
+                editSound.preload = 'auto'; 
+            } catch (e) {
+                console.error("Не удалось создать аудио объект:", e);
+            }
+        }
+    }
+    // Вызовем initSound при первом клике на любую кнопку "Редактировать"
+    // или можно вызвать его сразу, если политики браузера позволяют предзагрузку.
+    // Для большей надежности - при клике.
+
     // ПУТИ К ВАШИМ ИЗОБРАЖЕНИЯМ ДЛЯ БОКОВЫХ ПАНЕЛЕЙ
-    const cemLeftPanelImage = 'images/Left.jpg'; // Пример: 'images/left-panel.jpg'; 
-    const cemRightPanelImage = 'images/Right.jpg';// Пример: 'images/right-panel.jpg';
+    const cemLeftPanelImage = ''; // Пример: 'images/left-wing.jpg'; 
+    const cemRightPanelImage = '';// Пример: 'images/right-wing.jpg';
 
     function checkImageExists(url, callback) {
         if (!url) { callback(false); return; }
@@ -63,12 +81,26 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.js-open-edit-modal').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
-            const postId = this.dataset.postid;
-            if (postId) {
-                loadPostDataForCemEdit(postId);
-            } else {
-                console.error('Post ID не найден на кнопке "Редактировать".');
+            
+            // Инициализируем звук, если еще не сделано
+            if (!editSound) {
+                initSound();
             }
+
+            // Воспроизведение звука
+            if (editSound) {
+                editSound.currentTime = 0; 
+                const playPromise = editSound.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn("Не удалось воспроизвести звук при клике на редактирование:", error);
+                    });
+                }
+            }
+
+            const postId = this.dataset.postid;
+            if (postId) loadPostDataForCemEdit(postId);
+            else console.error('Post ID не найден.');
         });
     });
 
@@ -113,76 +145,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function positionAndSizeWings() {
         if (!cemEditorPane || !cemModalLeftPanel || !cemModalRightPanel || !cemModalOverlay) return;
-
         const editorRect = cemEditorPane.getBoundingClientRect();
-        const overlayRect = cemModalOverlay.getBoundingClientRect(); // Нужен для коррекции, если оверлей не 0,0
+        const overlayRect = cemModalOverlay.getBoundingClientRect();
 
-        if (editorRect.height === 0 || editorRect.width === 0) {
-            console.warn("Размеры панели редактора равны нулю, позиционирование крыльев может быть неверным. Попробуем позже.");
-            // Если размеры 0, возможно, стоит отложить или использовать дефолтные
-            // Для простоты, пока оставим так, но это может потребовать более сложной логики ожидания
-            return; 
+        if (editorRect.height < 50 || editorRect.width < 50) { // Если редактор еще не виден или слишком мал
+             // Установить какие-то дефолтные размеры, чтобы анимация сработала
+            const defaultWingSize = Math.min(window.innerHeight * 0.3, window.innerWidth * 0.2, 200);
+            [cemModalLeftPanel, cemModalRightPanel].forEach(wing => {
+                wing.style.width = `${defaultWingSize}px`;
+                wing.style.height = `${defaultWingSize}px`;
+                wing.style.top = `calc(50% - ${defaultWingSize / 2}px)`; // Центр оверлея
+            });
+            cemModalLeftPanel.style.left = `calc(50% - ${cemEditorPane.offsetWidth/2 + defaultWingSize + 20}px)`;
+            cemModalRightPanel.style.left = `calc(50% + ${cemEditorPane.offsetWidth/2 + 20}px)`;
+            return; // Размеры редактора еще не окончательные, выйдем
         }
 
-        // Размер "крыла" - квадрат, например, 60% от высоты редактора, но не меньше/больше определенных пределов
-        const wingDimension = Math.max(150, Math.min(editorRect.height * 0.65, 280)); 
+        const wingDimension = Math.max(150, Math.min(editorRect.height * 0.65, 250));
 
         [cemModalLeftPanel, cemModalRightPanel].forEach(wing => {
-            if (!wing) return;
             wing.style.width = `${wingDimension}px`;
             wing.style.height = `${wingDimension}px`;
-            // Вертикальное позиционирование: центр крыла на уровне примерно середины редактора
-            const wingTop = (editorRect.top - overlayRect.top) + (editorRect.height / 2) - (wingDimension / 2);
+            // Вертикальное позиционирование крыла: его центр на уровне 2/3 высоты редактора
+            const wingTop = (editorRect.top - overlayRect.top) + (editorRect.height * 0.60) - (wingDimension / 2);
             wing.style.top = `${wingTop}px`;
         });
-
         const gap = 20; // Отступ между редактором и крылом
-        if (cemModalLeftPanel) {
-            cemModalLeftPanel.style.left = `${editorRect.left - overlayRect.left - wingDimension - gap}px`;
-        }
-        if (cemModalRightPanel) {
-            cemModalRightPanel.style.left = `${editorRect.right - overlayRect.left + gap}px`;
-        }
+        cemModalLeftPanel.style.left = `${editorRect.left - overlayRect.left - wingDimension - gap}px`;
+        cemModalRightPanel.style.left = `${editorRect.right - overlayRect.left + gap}px`;
     }
 
+
     function openCemModal() {
-        if (cemModalOverlay && cemEditorPane) { // Убедимся, что и редактор есть
+        if (cemModalOverlay) {
             cemModalOverlay.style.display = 'flex';
-            
-            requestAnimationFrame(() => { 
-                positionAndSizeWings(); 
-                
-                setTimeout(() => { 
-                     cemModalOverlay.classList.add('active');
+            requestAnimationFrame(() => {
+                positionAndSizeWings(); // Устанавливаем размеры и позиции крыльев
+                setTimeout(() => {
+                     cemModalOverlay.classList.add('active'); // Запускаем CSS анимации
                      adjustCemTitleTextSpacing(); 
-                }, 50); // Небольшая задержка для применения стилей JS перед CSS анимацией
+                }, 20); 
             });
             if (themeBodyElement) themeBodyElement.style.overflow = 'hidden';
         }
     }
 
-       function closeCemModal() {
+    function closeCemModal() {
         if (cemModalOverlay) {
             cemModalOverlay.classList.remove('active');
             setTimeout(() => {
                 if(cemModalOverlay) cemModalOverlay.style.display = 'none';
                 resetCemEditForm();
-                 // Сбрасываем только те стили, которые динамически вычисляются для позиции и размера
-                if(cemModalLeftPanel) {
-                    cemModalLeftPanel.style.width = '';
-                    cemModalLeftPanel.style.height = '';
-                    cemModalLeftPanel.style.top = '';
-                    cemModalLeftPanel.style.left = '';
-                    // backgroundImage НЕ трогаем
-                }
-                if(cemModalRightPanel) {
-                    cemModalRightPanel.style.width = '';
-                    cemModalRightPanel.style.height = '';
-                    cemModalRightPanel.style.top = '';
-                    cemModalRightPanel.style.left = '';
-                    // backgroundImage НЕ трогаем
-                }
-            }, 500); 
+                // Сброс инлайновых стилей крыльев, чтобы при следующем открытии они пересчитались
+                if(cemModalLeftPanel) cemModalLeftPanel.style.cssText = ''; 
+                if(cemModalRightPanel) cemModalRightPanel.style.cssText = '';
+            }, 500); // Время = самой долгой анимации
             if (themeBodyElement) themeBodyElement.style.overflow = 'auto';
         }
     }
@@ -199,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadPostDataForCemEdit(postId) {
         if (!cemEditPostForm || !cemEditPostIdInput || !cemEditPostContentInput || !cemCurrentImagePreviewContainer || !cemCurrentEditImage || !cemDeleteCurrentImageCheckbox || !cemEditPostImageInput) {
-            console.error("CEM: Один или несколько элементов формы редактирования не найдены."); return;
+            console.error("CEM JS: Один или несколько элементов формы редактирования не найдены."); return;
         }
         resetCemEditForm(); 
         const formData = new FormData();
@@ -222,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     cemCurrentImagePreviewContainer.style.display = 'none';
                 }
                 cemDeleteCurrentImageCheckbox.checked = false;
-                openCemModal(); // Открываем модалку ПОСЛЕ того, как данные загружены и форма почти готова
+                openCemModal(); // Открываем модалку ПОСЛЕ загрузки данных
             } else { alert('Ошибка получения данных поста: ' + (data.message || 'Неизвестная ошибка.')); }
         })
         .catch(error => { console.error('Fetch error (loadPostDataForCemEdit):', error); alert('Сетевая ошибка при загрузке данных для редактирования.'); });
@@ -257,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updatePostOnPage(updatedPostData) {
-        if (!updatedPostData || typeof updatedPostData.id === 'undefined') { console.error('CEM: Некорректные данные для обновления поста.', updatedPostData); return; }
+        if (!updatedPostData || typeof updatedPostData.id === 'undefined') { console.error('CEM JS: Некорректные данные для обновления поста.', updatedPostData); return; }
         const postArticle = document.querySelector(`.post-item[data-postitemid="${updatedPostData.id}"]`);
         if (!postArticle) { return; } 
 
@@ -297,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function formatDate(dateStringSQL) {
         if (!dateStringSQL) return ''; 
         try { 
-            const date = new Date(dateStringSQL.replace(' ', 'T') + 'Z'); // Добавляем 'Z' для UTC, если время из БД в UTC
+            const date = new Date(dateStringSQL.replace(' ', 'T')); 
             if (isNaN(date.getTime())) return dateStringSQL; 
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
