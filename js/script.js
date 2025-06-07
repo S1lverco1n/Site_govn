@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Для большей надежности - при клике.
 
     // ПУТИ К ВАШИМ ИЗОБРАЖЕНИЯМ ДЛЯ БОКОВЫХ ПАНЕЛЕЙ
-    const cemLeftPanelImage = ''; // Пример: 'images/left-wing.jpg'; 
-    const cemRightPanelImage = '';// Пример: 'images/right-wing.jpg';
+    const cemLeftPanelImage = 'my_landing_auth/Images/'; // Пример: 'images/left-wing.jpg'; 
+    const cemRightPanelImage = 'Images/';// Пример: 'images/right-wing.jpg';
 
     function checkImageExists(url, callback) {
         if (!url) { callback(false); return; }
